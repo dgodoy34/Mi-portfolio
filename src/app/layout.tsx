@@ -22,12 +22,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+ return (
+    <html lang="es">
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+        {/* Font Awesome para íconos de WhatsApp y chat */}
+        <link 
+          rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" 
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" 
+          crossOrigin="anonymous" 
+          referrerPolicy="no-referrer" 
+        />
+        
+        {/* Otros meta si querés (opcional) */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charSet="utf-8" />
+      </head>
+      <body className="antialiased">
         {children}
+        {/* Elfsight AI Chatbot */}
+  <script src="https://static.elfsight.com/platform/platform.js" async></script>
+  <div className="elfsight-app-3d6ceec1-90a2-4bfe-82a4-3c5e1c977041" data-elfsight-app-lazy></div>
       </body>
     </html>
   );

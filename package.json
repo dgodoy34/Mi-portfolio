@@ -9,12 +9,22 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tiptap/extension-color": "^3.18.0",
+    "@tiptap/extension-highlight": "^3.18.0",
+    "@tiptap/extension-text-align": "^3.18.0",
+    "@tiptap/react": "^3.18.0",
+    "@tiptap/starter-kit": "^3.18.0",
+    "firebase": "^12.8.0",
+    "gray-matter": "^4.0.3",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/firebase": "^2.4.32",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
