@@ -20,8 +20,7 @@ import BubbleMenu from '@tiptap/extension-bubble-menu';
 import FloatingMenu from '@tiptap/extension-floating-menu';
 import Underline from '@tiptap/extension-underline'; // ✅ NUEVA LÍNEA
 
-
-// ✅ COMPONENTE TIPTAP EDITOR - CORREGIDO
+// ✅ COMPONENTE TIPTAP EDITOR - CORREGIDO Y MEJORADO
 const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html: string) => void }) => {
   const editor = useEditor({
     extensions: [
@@ -31,152 +30,93 @@ const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html:
       Color,
       TextStyle,
       Underline,
-      BubbleMenu,
-      FloatingMenu,
+      BubbleMenu,  // Si no lo usás, podés removerlo temporalmente
+      FloatingMenu.configure({
+       
+      }),
     ],
-    content: content,
+    content: content || '<p>Escribe algo aquí...</p>',  // fallback para evitar undefined
+    immediatelyRender: false,  // ← FIX PRINCIPAL: evita el error de SSR/hydration
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
+    },
+    // Mejora perf y estilos
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] p-4 bg-gray-950 text-gray-100 prose-invert',
+      },
     },
   });
 
   if (!editor) {
-    return <div style={{ color: '#000000', backgroundColor: '#FFFFFF', padding: '1rem', minHeight: '200px' }}>Cargando editor...</div>;
+    return <div className="min-h-[300px] p-4 bg-gray-950 text-gray-500">Cargando editor...</div>;
   }
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      {/* Toolbar - ESTILO OSCURO */}
-      <div className="bg-gray-900 p-2 flex flex-wrap gap-1 border-b border-gray-800">
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('bold') ? 'bg-blue-700' : ''}`}
-          title="Negrita"
-        >
-          <strong>B</strong>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('italic') ? 'bg-blue-700' : ''}`}
-          title="Cursiva"
-        >
-          <em>I</em>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('underline') ? 'bg-blue-700' : ''}`}
-          title="Subrayado"
-        >
-          <u>U</u>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('strike') ? 'bg-blue-700' : ''}`}
-          title="Tachado"
-        >
-          <s>S</s>
-        </button>
-        
-        <div className="border-l mx-2 h-6 border-gray-700"></div>
-        
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive({ textAlign: 'left' }) ? 'bg-blue-700' : ''}`}
-          title="Alinear izquierda"
-        >
-          ↹
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive({ textAlign: 'center' }) ? 'bg-blue-700' : ''}`}
-          title="Centrar"
-        >
-          ↹
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive({ textAlign: 'right' }) ? 'bg-blue-700' : ''}`}
-          title="Alinear derecha"
-        >
-          ↹
-        </button>
-        
-        <div className="border-l mx-2 h-6 border-gray-700"></div>
-        
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('bulletList') ? 'bg-blue-700' : ''}`}
-          title="Lista con viñetas"
-        >
-          •
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('orderedList') ? 'bg-blue-700' : ''}`}
-          title="Lista numerada"
-        >
-          1.
-        </button>
-        
-        <div className="border-l mx-2 h-6 border-gray-700"></div>
-        
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-700' : ''}`}
-          title="Título 1"
-        >
-          H1
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`p-1.5 hover:bg-gray-800 rounded text-white ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-700' : ''}`}
-          title="Título 2"
-        >
-          H2
-        </button>
-        
-        <div className="border-l mx-2 h-6 border-gray-700"></div>
-        
-        <button
-          onClick={() => editor.chain().focus().undo().run()}
-          className="p-1.5 hover:bg-gray-800 rounded text-white"
-          title="Deshacer"
-          disabled={!editor.can().undo()}
-        >
-          ↩
-        </button>
-        <button
-          onClick={() => editor.chain().focus().redo().run()}
-          className="p-1.5 hover:bg-gray-800 rounded text-white"
-          title="Rehacer"
-          disabled={!editor.can().redo()}
-        >
-          ↪
-        </button>
-      </div>
-      
-      {/* Editor de texto */}
-      <div 
-        style={{ 
-          color: '#000000', 
-          backgroundColor: '#FFFFFF',
-          minHeight: '200px',
-          padding: '1rem',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}
+
+return (
+  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
+    {/* Toolbar - fondo oscuro pero con texto blanco legible */}
+    <div className="bg-gray-800 p-2 flex flex-wrap gap-2 border-b border-gray-700">
+      <button
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('bold') ? 'bg-blue-600' : ''}`}
+        title="Negrita"
       >
-        <EditorContent 
-          editor={editor} 
-          style={{ 
-            color: '#000000', 
-            backgroundColor: '#FFFFFF',
-            minHeight: '180px',
-            outline: 'none'
-          }}
-        />
-      </div>
+        <strong>B</strong>
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('italic') ? 'bg-blue-600' : ''}`}
+        title="Cursiva"
+      >
+        <em>I</em>
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('underline') ? 'bg-blue-600' : ''}`}
+        title="Subrayado"
+      >
+        <u>U</u>
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('strike') ? 'bg-blue-600' : ''}`}
+        title="Tachado"
+      >
+        <s>S</s>
+      </button>
+
+      {/* Separador */}
+      <div className="border-l mx-2 h-6 border-gray-600"></div>
+
+      {/* Más botones que ya tenías */}
+      <button
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('bulletList') ? 'bg-blue-600' : ''}`}
+        title="Lista con viñetas"
+      >
+        •
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('orderedList') ? 'bg-blue-600' : ''}`}
+        title="Lista numerada"
+      >
+        1.
+      </button>
+      {/* Agregá H1, H2, alinear, etc. si los tenés */}
     </div>
-  );
+
+    {/* Área del editor - fondo BLANCO, texto negro */}
+    <div className="p-4 min-h-[300px] bg-white text-gray-900">
+      <EditorContent 
+        editor={editor} 
+        className="prose max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 focus:outline-none"
+      />
+    </div>
+  </div>
+);
 };
+
 
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
@@ -549,13 +489,6 @@ export default function Admin() {
               onChange={setPostContenido} 
             />
           </div>
-
-
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Contenido completo</label>
-              <TiptapEditor content={postContenido} onChange={setPostContenido} />
-            </div>
-
             <div>
               <label className="block text-gray-700 font-medium mb-2">Subir Imagen Principal</label>
               <input
