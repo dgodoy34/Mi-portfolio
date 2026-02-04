@@ -1,63 +1,9 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Estilos para el editor Tiptap - Solución para texto blanco */
-.tiptap-editor {
-  color: #1a202c !important;
-}
-
-.tiptap-editor .ProseMirror {
-  color: #1a202c !important;
-  background-color: white !important;
-}
-
-.tiptap-editor .ProseMirror p,
-.tiptap-editor .ProseMirror h1,
-.tiptap-editor .ProseMirror h2,
-.tiptap-editor .ProseMirror h3,
-.tiptap-editor .ProseMirror strong,
-.tiptap-editor .ProseMirror em,
-.tiptap-editor .ProseMirror u,
-.tiptap-editor .ProseMirror li {
-  color: #1a202c !important;
-}
-
-/* src/app/globals.css */
-
-/* Última línea de defensa */
-.tiptap-editor,
-.tiptap-editor * {
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
-}
-
-/* Para cualquier elemento residual */
-.ProseMirror,
-.ProseMirror * {
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
+  font-family: Arial, sans-serif;
+  background: white;
+  color: #333;
 }

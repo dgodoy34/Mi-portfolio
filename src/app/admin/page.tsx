@@ -8,6 +8,7 @@ import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Link from 'next/link';
 
+
 // Importar Tiptap
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -15,34 +16,36 @@ import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import Color from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
+import BubbleMenu from '@tiptap/extension-bubble-menu';
+import FloatingMenu from '@tiptap/extension-floating-menu';
+import Underline from '@tiptap/extension-underline'; // ✅ NUEVA LÍNEA
 
 
-// Componente del Editor Tiptap - CORREGIDO
+// ✅ COMPONENTE TIPTAP EDITOR - CORREGIDO
 const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html: string) => void }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Highlight,
       Color,
       TextStyle,
+      Underline,
+      BubbleMenu,
+      FloatingMenu,
     ],
     content: content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    immediatelyRender: false,
   });
 
   if (!editor) {
     return <div style={{ color: '#000000', backgroundColor: '#FFFFFF', padding: '1rem', minHeight: '200px' }}>Cargando editor...</div>;
   }
-
   return (
     <div className="border rounded-lg overflow-hidden">
-      {/* Toolbar - ESTILO OSCURO (como en tu imagen) */}
+      {/* Toolbar - ESTILO OSCURO */}
       <div className="bg-gray-900 p-2 flex flex-wrap gap-1 border-b border-gray-800">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -135,7 +138,7 @@ const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html:
         
         <button
           onClick={() => editor.chain().focus().undo().run()}
-          className="p-1.5 hover:bg-gray-800 rounded text-white" // ✅ CORREGIDO: Añadido =
+          className="p-1.5 hover:bg-gray-800 rounded text-white"
           title="Deshacer"
           disabled={!editor.can().undo()}
         >
@@ -151,7 +154,7 @@ const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html:
         </button>
       </div>
       
-      {/* ✅ ESTA PARTE FALTABA - Editor de texto */}
+      {/* Editor de texto */}
       <div 
         style={{ 
           color: '#000000', 
@@ -538,6 +541,15 @@ export default function Admin() {
                 required
               />
             </div>
+
+            <div>
+            <label className="block text-gray-700 font-medium mb-2">Contenido completo</label>
+            <TiptapEditor 
+              content={postContenido} 
+              onChange={setPostContenido} 
+            />
+          </div>
+
 
             <div>
               <label className="block text-gray-700 font-medium mb-2">Contenido completo</label>
