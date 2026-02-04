@@ -11,21 +11,25 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [trabajos, setTrabajos] = useState<any[]>([]);
   const [ultimoPost, setUltimoPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
 
-    const fetchTrabajos = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'trabajos'));
-        const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setTrabajos(docs);
-      } catch (error) {
-        console.error("Error cargando trabajos:", error);
-      }
-    };
+  const fetchTrabajos = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'trabajos'));
+      const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTrabajos(docs);
+    } catch (error) {
+      console.error("Error cargando trabajos:", error);
+    } finally {
+      // ← ACA PONÉ ESTO (siempre se ejecuta, termine bien o mal)
+      setLoading(false);
+    }
+  };
 
     const fetchUltimoPost = async () => {
       try {
@@ -255,52 +259,81 @@ export default function Home() {
   </div>
 </section>
 
-      {/* TRABAJOS DINÁMICOS */}
-      <section id="proyectos" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-blue-900">
-            Mis Trabajos
-          </h2>
+{/* TRABAJOS DINÁMICOS */}
+<section id="proyectos" className="py-20 bg-gray-50">
+  <div className="max-w-7xl mx-auto px-6">
+    <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-blue-900">
+      Mis Trabajos
+    </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {trabajos.map((trabajo) => (
-              <div key={trabajo.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition relative">
-                {trabajo.imagenUrl && (
-                  <img 
-                    src={trabajo.imagenUrl} 
-                    alt={trabajo.titulo} 
-                    className="w-full h-56 object-cover"
-                  />
-                )}
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-3 text-blue-900">{trabajo.titulo}</h3>
-                  <p className="text-gray-600 mb-4">{trabajo.descripcion}</p>
-                  <a href={trabajo.linkProyecto} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:underline">
-                    Ver Proyecto →
-                  </a>
-
-                  {user && (
-                    <div className="flex gap-4 mt-4">
-                      <Link 
-                        href={`/admin?edit=trabajo&id=${trabajo.id}`}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition text-sm font-medium"
-                      >
-                        Editar
-                      </Link>
-                      <button 
-                        onClick={() => handleDeleteTrabajo(trabajo.id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm font-medium"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  )}
-                </div>
+    {loading ? (
+      <p className="text-center text-gray-600 text-lg py-10">
+        Cargando trabajos...
+      </p>
+    ) : trabajos.length === 0 ? (
+      <p className="text-center text-gray-600 text-lg py-10">
+        Aún no hay proyectos cargados.
+      </p>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {trabajos.map((trabajo) => (
+          <div
+            key={trabajo.id}
+            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition"
+          >
+            {/* Imagen */}
+            {trabajo.imagenUrl ? (
+              <img
+                src={trabajo.imagenUrl}
+                alt={trabajo.titulo || 'Trabajo sin título'}
+                className="w-full h-56 object-cover"
+              />
+            ) : (
+              <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
+                Sin imagen
               </div>
-            ))}
+            )}
+
+            <div className="p-6">
+              <h3 className="text-2xl font-bold mb-3 text-blue-900">
+                {trabajo.titulo || 'Sin título'}
+              </h3>
+              <div className="text-gray-600 mb-4 line-clamp-3 prose prose-sm"dangerouslySetInnerHTML={{__html: trabajo.descripcion || 'Sin descripción disponible'
+              }}
+              />
+
+              {/* Link simple "Ver Proyecto →" que lleva a /trabajos */}
+              <Link
+                href="/trabajos"
+                className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
+              >
+                Ver Proyecto <span aria-hidden="true">→</span>
+              </Link>
+
+              {/* Botones admin (solo si está logueado) */}
+              {user && (
+                <div className="flex gap-4 mt-6">
+                  <Link
+                    href={`/admin?edit=trabajo&id=${trabajo.id}`}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition text-sm font-medium"
+                  >
+                    Editar
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteTrabajo(trabajo.id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
 
       {/* SOBRE MÍ */}
       <section id="sobre-mi" className="py-20 bg-gradient-to-b from-white to-gray-50 text-gray-800">
