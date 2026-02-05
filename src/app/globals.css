@@ -7,3 +7,8 @@ body {
   background: white;
   color: #333;
 }
+/* globals.css 
+.eapps-chat-floating-button,
+[class*="elfsight-app"] {
+  display: none !important;
+}*/

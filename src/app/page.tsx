@@ -259,6 +259,8 @@ export default function Home() {
   </div>
 </section>
 
+
+
 {/* TRABAJOS DINÁMICOS */}
 <section id="proyectos" className="py-20 bg-gray-50">
   <div className="max-w-7xl mx-auto px-6">
@@ -298,9 +300,12 @@ export default function Home() {
               <h3 className="text-2xl font-bold mb-3 text-blue-900">
                 {trabajo.titulo || 'Sin título'}
               </h3>
-              <div className="text-gray-600 mb-4 line-clamp-3 prose prose-sm"dangerouslySetInnerHTML={{__html: trabajo.descripcion || 'Sin descripción disponible'
-              }}
-              />
+              <div
+  className="text-gray-600 mb-4 line-clamp-3 prose prose-sm"
+  dangerouslySetInnerHTML={{
+    __html: trabajo.descripcion || 'Sin descripción disponible'
+  }}
+/>
 
               {/* Link simple "Ver Proyecto →" que lleva a /trabajos */}
               <Link
@@ -399,6 +404,8 @@ export default function Home() {
         </div>
       </section>
 
+      
+
       {/* CONTACTO */}
       <section id="contacto" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
@@ -447,9 +454,12 @@ export default function Home() {
         </div>
       </footer>
 
-      <style>{`
-        .eapps-chat-floating-button, [class*="elfsight-app"] { display: none !important; }
-      `}</style>
+    <div suppressHydrationWarning>
+  <style>{`
+    .eapps-chat-floating-button, [class*='elfsight-app'] { display: none !important; }
+  `}</style>
+  {/* Resto del contenido */}
+</div>
       
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     </div>

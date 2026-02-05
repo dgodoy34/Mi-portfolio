@@ -9,114 +9,92 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Link from 'next/link';
 
 
-// Importar Tiptap
+// Importar Tiptap y extensiones necesarias
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import Color from '@tiptap/extension-color';
-import { TextStyle } from '@tiptap/extension-text-style';
-import BubbleMenu from '@tiptap/extension-bubble-menu';
-import FloatingMenu from '@tiptap/extension-floating-menu';
-import Underline from '@tiptap/extension-underline'; // ✅ NUEVA LÍNEA
+import {TextStyle} from '@tiptap/extension-text-style';
+import FontFamily from '@tiptap/extension-font-family'; // Para fuentes
 
-// ✅ COMPONENTE TIPTAP EDITOR - CORREGIDO Y MEJORADO
+// Componente del Editor Tiptap - CORREGIDO (teclado + fuentes, color, títulos)
 const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html: string) => void }) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3], // H1, H2, H3
+        },
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
       Highlight,
       Color,
       TextStyle,
-      Underline,
-      BubbleMenu,  // Si no lo usás, podés removerlo temporalmente
-      FloatingMenu.configure({
-       
+      FontFamily.configure({
+        types: ['textStyle'], // Permite cambiar fuente
       }),
     ],
-    content: content || '<p>Escribe algo aquí...</p>',  // fallback para evitar undefined
-    immediatelyRender: false,  // ← FIX PRINCIPAL: evita el error de SSR/hydration
+    content: content || '<p>Escribe aquí tu contenido...</p>',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    // Mejora perf y estilos
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] p-4 bg-gray-950 text-gray-100 prose-invert',
-      },
-    },
+    editable: true,          // Fuerza que sea editable
+    autofocus: 'end',        // Enfoca al final para que capture teclado
+    immediatelyRender: false,
   });
 
   if (!editor) {
-    return <div className="min-h-[300px] p-4 bg-gray-950 text-gray-500">Cargando editor...</div>;
+    return <div className="p-6 bg-white border rounded min-h-[300px] flex items-center justify-center text-gray-500">Cargando editor...</div>;
   }
 
-return (
-  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
-    {/* Toolbar - fondo oscuro pero con texto blanco legible */}
-    <div className="bg-gray-800 p-2 flex flex-wrap gap-2 border-b border-gray-700">
-      <button
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('bold') ? 'bg-blue-600' : ''}`}
-        title="Negrita"
-      >
-        <strong>B</strong>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('italic') ? 'bg-blue-600' : ''}`}
-        title="Cursiva"
-      >
-        <em>I</em>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('underline') ? 'bg-blue-600' : ''}`}
-        title="Subrayado"
-      >
-        <u>U</u>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('strike') ? 'bg-blue-600' : ''}`}
-        title="Tachado"
-      >
-        <s>S</s>
-      </button>
+  return (
+    <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm">
+      {/* Toolbar OSCURA + nuevas opciones */}
+      <div className="bg-gray-900 p-2.5 flex flex-wrap gap-1.5 border-b border-gray-800">
+        {/* Básicos */}
+        <button onClick={() => editor.chain().focus().toggleBold().run()} className={`px-3 py-1.5 rounded text-white font-bold hover:bg-gray-800 ${editor.isActive('bold') ? 'bg-blue-700' : ''}`} title="Negrita">B</button>
+        <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`px-3 py-1.5 rounded text-white italic hover:bg-gray-800 ${editor.isActive('italic') ? 'bg-blue-700' : ''}`} title="Cursiva">I</button>
+        <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={`px-3 py-1.5 rounded text-white underline hover:bg-gray-800 ${editor.isActive('underline') ? 'bg-blue-700' : ''}`} title="Subrayado">U</button>
 
-      {/* Separador */}
-      <div className="border-l mx-2 h-6 border-gray-600"></div>
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
 
-      {/* Más botones que ya tenías */}
-      <button
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('bulletList') ? 'bg-blue-600' : ''}`}
-        title="Lista con viñetas"
-      >
-        •
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={`p-2 hover:bg-gray-700 rounded text-white ${editor.isActive('orderedList') ? 'bg-blue-600' : ''}`}
-        title="Lista numerada"
-      >
-        1.
-      </button>
-      {/* Agregá H1, H2, alinear, etc. si los tenés */}
-    </div>
+        {/* Títulos */}
+        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-700' : ''}`} title="Título grande (H1)">H1</button>
+        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-700' : ''}`} title="Título mediano (H2)">H2</button>
+        <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 3 }) ? 'bg-blue-700' : ''}`} title="Título chico (H3)">H3</button>
 
-    {/* Área del editor - fondo BLANCO, texto negro */}
-    <div className="p-4 min-h-[300px] bg-white text-gray-900">
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* Color de letra */}
+        <button onClick={() => editor.chain().focus().setColor('#000000').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Negro">A</button>
+        <button onClick={() => editor.chain().focus().setColor('#dc2626').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Rojo">A</button>
+        <button onClick={() => editor.chain().focus().setColor('#2563eb').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Azul">A</button>
+
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* Fuentes básicas */}
+        <button onClick={() => editor.chain().focus().setFontFamily('sans-serif').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'sans-serif' }) ? 'bg-blue-700' : ''}`} title="Sans-serif (normal)">Sans</button>
+        <button onClick={() => editor.chain().focus().setFontFamily('serif').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'serif' }) ? 'bg-blue-700' : ''}`} title="Serif (clásica)">Serif</button>
+        <button onClick={() => editor.chain().focus().setFontFamily('monospace').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'monospace' }) ? 'bg-blue-700' : ''}`} title="Monospace (código)">Mono</button>
+
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* Listas y alineación */}
+        <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('bulletList') ? 'bg-blue-700' : ''}`} title="Lista con viñetas">•</button>
+        <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('orderedList') ? 'bg-blue-700' : ''}`} title="Lista numerada">1.</button>
+      </div>
+
+      {/* Área de edición - TEXTO NEGRO y editable */}
       <EditorContent 
         editor={editor} 
-        className="prose max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 focus:outline-none"
+        className="p-6 min-h-[400px] text-gray-900 prose prose-lg focus:outline-none"
       />
     </div>
-  </div>
-);
+  );
 };
-
 
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
@@ -176,48 +154,56 @@ export default function Admin() {
     await signOut(auth);
   };
 
-  // Guardar / Editar Trabajo
   const handleSaveTrabajo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      let imagenUrl = urlImagen;
-      if (imagenFile) {
-        const storageRef = ref(storage, `trabajos/${Date.now()}_${imagenFile.name}`);
-        await uploadBytes(storageRef, imagenFile);
-        imagenUrl = await getDownloadURL(storageRef);
-      }
+  e.preventDefault();
 
-      const data = {
-        titulo,
-        descripcion,
-        imagenUrl,
-        linkProyecto,
-        updatedAt: new Date().toISOString(),
-      };
+  // Validación básica (para que no guarde vacío)
+  if (!titulo.trim() || !descripcion.trim() || !linkProyecto.trim()) {
+    alert('Completá título, descripción y link al proyecto');
+    return;
+  }
 
-      if (editTrabajoId) {
-        await updateDoc(doc(db, 'trabajos', editTrabajoId), data);
-        alert('Trabajo actualizado!');
-      } else {
-        await addDoc(collection(db, 'trabajos'), { ...data, createdAt: new Date().toISOString() });
-        alert('Trabajo agregado!');
-      }
+  try {
+    // Siempre toma la URL escrita (incluso si editás sin subir archivo)
+    let imagenUrl = urlImagen.trim();
 
-      // Limpia
-      setTitulo('');
-      setDescripcion('');
-      setImagenFile(null);
-      setUrlImagen('');
-      setLinkProyecto('');
-      setEditTrabajoId(null);
+    const data = {
+      titulo: titulo.trim(),
+      descripcion: descripcion.trim(),
+      linkProyecto: linkProyecto.trim(),
+      imagenUrl, // ← AGREGADO: siempre guarda la URL si la escribiste
+      updatedAt: new Date().toISOString(),
+    };
 
-      // Recargar
-      const snap = await getDocs(collection(db, 'trabajos'));
-      setTrabajos(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    } catch (err: any) {
-      alert('Error: ' + err.message);
+    if (editTrabajoId) {
+      console.log('Actualizando trabajo ID:', editTrabajoId);
+      await updateDoc(doc(db, 'trabajos', editTrabajoId), data);
+      alert('¡Trabajo actualizado con éxito!');
+    } else {
+      console.log('Creando nuevo trabajo');
+      await addDoc(collection(db, 'trabajos'), {
+        ...data,
+        createdAt: new Date().toISOString(),
+      });
+      alert('¡Trabajo agregado con éxito!');
     }
-  };
+
+    // Limpieza del form
+    setTitulo('');
+    setDescripcion('');
+    setLinkProyecto('');
+    setUrlImagen(''); // Limpia la URL también
+    setEditTrabajoId(null);
+
+    // Recargar lista para ver cambios
+    const snap = await getDocs(collection(db, 'trabajos'));
+    setTrabajos(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+
+  } catch (err: any) {
+    console.error('Error al guardar trabajo:', err);
+    alert('Error al guardar: ' + (err.message || 'Revisa consola F12'));
+  }
+};
 
   const handleEditTrabajo = (item: any) => {
     setTitulo(item.titulo);

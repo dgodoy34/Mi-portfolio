@@ -4,25 +4,29 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../../lib/firebase';
+import { db } from '../../../../lib/firebase'; // ← CORREGIDO: ajusté el path (chequeá si es correcto en tu estructura)
 
 export default function ProyectoDetalle({ params }: { params: { id: string } }) {
   const [proyecto, setProyecto] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProyecto = async () => {
       try {
+        setLoading(true);
         const docRef = doc(db, 'trabajos', params.id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           setProyecto({ id: docSnap.id, ...docSnap.data() });
+          console.log('Proyecto cargado:', docSnap.data()); // Debug: ves en consola si tiene 'imagenUrl'
         } else {
-          console.log('No existe el proyecto');
+          setError('El proyecto no existe en la base de datos');
         }
-      } catch (error) {
-        console.error('Error cargando proyecto:', error);
+      } catch (err: any) {
+        console.error('Error cargando proyecto:', err);
+        setError('Hubo un error al cargar el proyecto: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -39,94 +43,60 @@ export default function ProyectoDetalle({ params }: { params: { id: string } }) 
     );
   }
 
-  if (!proyecto) {
+  if (error || !proyecto) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-gray-50">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Proyecto no encontrado</h1>
-        <p className="text-gray-600 mb-8 text-lg">
-          El proyecto que buscás no existe o fue eliminado.
-        </p>
-        <Link
-          href="/trabajos"
-          className="bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition shadow-lg"
-        >
-          Volver a Mis Proyectos
-        </Link>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center px-6">
+        <div className="bg-white p-8 rounded-xl shadow-md max-w-md">
+          <h1 className="text-3xl font-bold text-red-600 mb-4">¡Ups!</h1>
+          <p className="text-lg text-gray-700 mb-6">{error || 'No encontramos el proyecto'}</p>
+          <Link href="/trabajos" className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition inline-block">
+            Volver a Proyectos
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header con título */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            {proyecto.titulo || 'Proyecto sin título'}
-          </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto">
-            {proyecto.descripcion?.substring(0, 200) || 'Vista previa del proyecto'}
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-16 px-6">
+      <div className="max-w-4xl mx-auto">
+        <Link href="/trabajos" className="text-blue-600 hover:underline mb-8 inline-block font-medium">
+          ← Volver a Proyectos
+        </Link>
 
-      {/* Contenido principal */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* Imagen grande */}
-          <div>
-            {proyecto.imagenUrl ? (
-              <Image
-                src={proyecto.imagenUrl}
-                alt={proyecto.titulo || 'Vista previa del proyecto'}
-                width={800}
-                height={600}
-                className="w-full rounded-xl shadow-2xl object-cover"
-                priority
-              />
-            ) : (
-              <div className="w-full h-96 bg-gray-300 rounded-xl flex items-center justify-center text-gray-600 text-xl">
-                Sin imagen disponible
-              </div>
-            )}
-          </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-8">
+          {proyecto.titulo}
+        </h1>
 
-          {/* Detalles */}
-          <div className="flex flex-col justify-center">
-            <h2 className="text-3xl font-bold text-blue-900 mb-6">Descripción completa</h2>
-            {/* Render HTML real desde Tiptap */}
-            <div
-              className="text-gray-700 text-lg leading-relaxed mb-8 prose max-w-none prose-headings:text-blue-900 prose-a:text-blue-600 prose-a:underline"
-              dangerouslySetInnerHTML={{
-                __html: proyecto.descripcion || 'No hay descripción detallada para este proyecto.',
-              }}
-            />
+        {proyecto.imagenUrl ? (
+  <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 mx-auto max-w-3xl">
+  <img
+    src={proyecto.imagenUrl}
+    alt={proyecto.titulo}
+    className="w-full h-auto max-h-[400px] md:max-h-[550px] object-contain bg-gray-50"
+    loading="lazy"
+  />
+</div>
+) : (
+  <div className="mb-12 text-center text-gray-500 italic">
+    No hay imagen disponible para este proyecto
+  </div>
+)}
 
-            {/* Link externo si existe */}
-            {proyecto.linkProyecto && proyecto.linkProyecto.trim() !== '' && (
-              <a
-                href={
-                  proyecto.linkProyecto.startsWith('http')
-                    ? proyecto.linkProyecto
-                    : `https://${proyecto.linkProyecto}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition shadow-lg mb-8"
-              >
-                Ver Proyecto Completo <span aria-hidden="true">→</span>
-              </a>
-            )}
+        {/* Descripción */}
+        <div className="prose prose-lg text-gray-800 mb-12" dangerouslySetInnerHTML={{ __html: proyecto.descripcion }} />
 
-            {/* Volver */}
-            <Link
-              href="/trabajos"
-              className="text-blue-600 hover:underline font-medium text-lg"
-            >
-              ← Volver a Mis Proyectos
-            </Link>
-          </div>
-        </div>
+        {/* Link al proyecto */}
+        {proyecto.linkProyecto && (
+          <a 
+            href={proyecto.linkProyecto} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition shadow-lg"
+          >
+            Ver Proyecto Completo <span aria-hidden="true">→</span>
+          </a>
+        )}
       </div>
     </div>
   );

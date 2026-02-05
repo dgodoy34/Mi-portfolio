@@ -359,9 +359,13 @@ const fetchPost = async () => {
           </div>
         )}
 
-        <div className="bg-white p-8 md:p-14 rounded-3xl shadow-xl border border-gray-100 mb-16 prose prose-lg md:prose-xl max-w-none text-gray-800 leading-[1.8] font-serif prose-blue prose-headings:text-blue-900 prose-a:text-blue-600 hover:prose-a:underline">
-          <div dangerouslySetInnerHTML={{ __html: post.contenido || '' }} />
-        </div>
+        {/* Contenido del Artículo - CORREGIDO PARA QUE SE VEA EL HTML */}
+<div className="bg-white p-8 md:p-14 rounded-3xl shadow-xl border border-gray-100 mb-16">
+  <div
+    className="prose prose-lg md:prose-xl max-w-none text-gray-800 leading-[1.8] font-serif prose-blue prose-headings:text-blue-900 prose-a:text-blue-600 hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-lg"
+    dangerouslySetInnerHTML={{ __html: post.contenido || '' }}
+  />
+</div>
 
         {/* Interacción */}
         <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 mt-12">
