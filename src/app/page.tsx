@@ -104,57 +104,65 @@ export default function Home() {
 </a>
       
 
-      {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-blue-900">
-          <Link href="/" className="text-2xl font-bold">
-            Diego Godoy
-          </Link>
+     {/* NAVBAR */}
+<nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center h-16 md:h-20">
+      {/* Logo ocupa la mayor parte a la izquierda */}
+      <Link href="/" className="flex-shrink-0">
+        <img 
+          src="https://mdtstreet.mdtsublimados.com.ar/img/logo.png"           // ← ruta de tu logo
+          alt="IACreativaTools - Diego Godoy" 
+          className="h-16 md:h-20 w-auto"  // ajustá h-12/h-16 según el tamaño deseado
+        />
+      </Link>
 
-          <div className="flex items-center gap-8">
-            <ul className="hidden md:flex space-x-8 text-lg font-medium">
-              <li><Link href="/" className="hover:text-blue-600 transition">Inicio</Link></li>
-              <li><Link href="#sobre-mi" className="hover:text-blue-600 transition">Sobre Mí</Link></li>
-              <li><Link href="#proyectos" className="hover:text-blue-600 transition">Mis Trabajos</Link></li>
-              <li><Link href="#contacto" className="hover:text-blue-600 transition">Contacto</Link></li>
-            </ul>
+      {/* Menú y botones a la derecha (compacto) */}
+      <div className="flex items-center gap-6 md:gap-10">
+        <ul className="hidden md:flex space-x-6 lg:space-x-10 text-base lg:text-lg font-medium text-blue-900">
+          <li><Link href="/" className="hover:text-blue-600 transition">Inicio</Link></li>
+          <li><Link href="#sobre-mi" className="hover:text-blue-600 transition">Sobre Mí</Link></li>
+          <li><Link href="#proyectos" className="hover:text-blue-600 transition">Mis Trabajos</Link></li>
+          <li><Link href="#contacto" className="hover:text-blue-600 transition">Contacto</Link></li>
+        </ul>
 
-            <div className="flex items-center gap-4">
-              {user ? (
-                <>
-                  <Link
-                    href="/admin"
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-                  >
-                    Panel Admin
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
-                  >
-                    Salir
-                  </button>
-                </>
-              ) : (
-                <Link
-                  href="/admin"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-                >
-                  Admin Login
-                </Link>
-              )}
-            </div>
-          </div>
+        {/* Botones admin/login */}
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <Link
+                href="/admin"
+                className="bg-blue-600 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm md:text-base"
+              >
+                Panel Admin
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm md:text-base"
+              >
+                Salir
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/admin"
+              className="bg-blue-600 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm md:text-base"
+            >
+              Admin Login
+            </Link>
+          )}
         </div>
-      </nav>
-
+      </div>
+    </div>
+  </div>
+</nav>
       {/* HERO */}
       <section className="pt-32 pb-24 min-h-screen flex flex-col items-center justify-center px-6 text-center">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          Desarrollo tu Sitio Web Profesional
+          Desarrollo Web Profesional
         </h1>
         <p className="text-xl max-w-3xl mb-12 opacity-90">
-          Transformo ideas en soluciones digitales que generan clientes.
+         Consultoría Estratégica de IA · Desarrollo con Propósito · Mentores que Ejecutan <br className="hidden sm:block" /> soluciones digitales que generan clientes.
         </p>
         <div className="flex gap-6">
           <Link href="#proyectos" className="bg-white text-blue-700 px-8 py-4 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition">
