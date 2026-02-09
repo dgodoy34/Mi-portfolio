@@ -7,8 +7,150 @@ body {
   background: white;
   color: #333;
 }
-/* globals.css 
-.eapps-chat-floating-button,
-[class*="elfsight-app"] {
-  display: none !important;
-}*/
+
+/* =========================
+   TIPTAP ESTILOS (CORREGIDO - JUSTIFICADO + TAMAÑO)
+========================= */
+.tiptap {
+  font-family: Arial, sans-serif;
+  color: #111827;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.tiptap .ProseMirror {
+  outline: none;
+}
+
+/* ======= TITULOS ======= */
+.tiptap h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 1rem 0 0.6rem;
+}
+
+.tiptap h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 1rem 0 0.6rem;
+}
+
+.tiptap h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 1rem 0 0.6rem;
+}
+
+/* ======= PARRAFOS ======= */
+.tiptap p {
+  margin: 0.6rem 0;
+  text-align: left;
+}
+
+/* ======= JUSTIFICADO - FIX DEFINITIVO ======= */
+.tiptap p.text-align-left,
+.tiptap h1.text-align-left,
+.tiptap h2.text-align-left,
+.tiptap h3.text-align-left {
+  text-align: left !important;
+}
+
+.tiptap p.text-align-center,
+.tiptap h1.text-align-center,
+.tiptap h2.text-align-center,
+.tiptap h3.text-align-center {
+  text-align: center !important;
+}
+
+.tiptap p.text-align-right,
+.tiptap h1.text-align-right,
+.tiptap h2.text-align-right,
+.tiptap h3.text-align-right {
+  text-align: right !important;
+}
+
+.tiptap p.text-align-justify,
+.tiptap h1.text-align-justify,
+.tiptap h2.text-align-justify,
+.tiptap h3.text-align-justify {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  hyphens: auto !important;
+  -webkit-hyphens: auto !important;
+  -moz-hyphens: auto !important;
+  -ms-hyphens: auto !important;
+}
+
+/* Fallback para estilos inline */
+.tiptap p[style*="text-align: justify"],
+.tiptap h1[style*="text-align: justify"],
+.tiptap h2[style*="text-align: justify"],
+.tiptap h3[style*="text-align: justify"] {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+}
+
+/* ======= TAMAÑO DE LETRA ======= */
+.tiptap *[style*="font-size"] {
+  font-size: inherit !important;
+}
+
+/* ======= LISTAS ======= */
+.tiptap ul {
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.tiptap ol {
+  padding-left: 1.5rem;
+  list-style: decimal;
+}
+
+/* ======= IMAGENES ======= */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+/* ======= COLORES DE TEXTO ======= */
+.tiptap mark {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+/* ===== JUSTIFICADO - FIX 100% ===== */
+.tiptap p.text-align-justify,
+.tiptap h1.text-align-justify,
+.tiptap h2.text-align-justify,
+.tiptap h3.text-align-justify {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  hyphens: auto !important;
+}
+/* ===== FALLBACK PARA JUSTIFICADO ===== */
+.tiptap [style*="text-align: justify"] {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+}
+
+/* ===== JUSTIFICADO - FIX 100% ===== */
+.tiptap p.text-align-justify,
+.tiptap h1.text-align-justify,
+.tiptap h2.text-align-justify,
+.tiptap h3.text-align-justify {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  hyphens: auto !important;
+  -webkit-hyphens: auto !important;
+  -moz-hyphens: auto !important;
+  -ms-hyphens: auto !important;
+}
+
+/* ===== FALLBACK PARA JUSTIFICADO ===== */
+.tiptap [style*="text-align: justify"] {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+}

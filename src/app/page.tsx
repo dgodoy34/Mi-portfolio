@@ -177,9 +177,12 @@ export default function Home() {
       {/* ÚLTIMA PUBLICACIÓN DEL BLOG */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-8 text-blue-900">
-            Última Publicación del Blog
-          </h2>
+         <h2 className="text-4xl font-bold text-center mb-2 text-blue-900">
+  Explorá nuestro Blog
+  <br />
+  Novedades - Herramientas - Tendencias en IA
+</h2>
+
 
           {ultimoPost ? (
             <div className="bg-gray-50 p-8 rounded-2xl shadow-lg max-w-4xl mx-auto relative border border-gray-100">
@@ -273,7 +276,7 @@ export default function Home() {
 <section id="proyectos" className="py-20 bg-gray-50">
   <div className="max-w-7xl mx-auto px-6">
     <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-blue-900">
-      Mis Trabajos
+      Mis Proyectos
     </h2>
 
     {loading ? (
@@ -369,11 +372,19 @@ export default function Home() {
                 Sobre Mí
               </h2>
               <p className="text-lg leading-relaxed">
-                Hola, soy Diego desde Tristán Suárez, Buenos Aires. Me apasiona la tecnología y crear soluciones que generen resultados reales.
-              </p>
-              <p className="text-lg leading-relaxed">
-                Desarrollo sitios web profesionales para emprendedores e integro herramientas de IA. Además, lidero el proyecto <strong>Somos Otra Radio</strong>.
-              </p>
+  Hola, soy Diego creador de IACreativaTools. Con más de 10 años de experiencia en desarrollo web.
+</p>
+
+<p className="text-lg leading-relaxed">
+  Ayudo a emprendedores y PYMES a usar Inteligencia Artificial y herramientas digitales de forma práctica: para{" "}
+  <strong>atraer más clientes, mejorar procesos y aumentar ventas</strong>.
+</p>
+
+<p className="text-lg leading-relaxed">
+  Desarrollo sitios web profesionales, automatizo tareas y creo sistemas simples que trabajan por vos{" "}
+  <em>incluso cuando no estás conectado</em>.
+</p>
+
               <div className="pt-4">
                 <Link href="#contacto" className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition shadow-md inline-flex items-center gap-2">
                   Hablemos de tu proyecto <span className="text-xl">→</span>
@@ -388,12 +399,12 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-blue-900">
-            Lo que Dicen de Mi Trabajo
+            Lo que Dicen de mis Proyectos
           </h2>
           <div className="max-w-4xl mx-auto">
             <div className="bg-blue-50 p-8 rounded-xl shadow-inner border border-blue-100">
               <p className="text-xl italic text-center font-serif text-gray-700 mb-6">
-                "Diego diseñó y desarrolló el sitio web de mi negocio de sublimación. Las ventas aumentaron rápidamente. ¡Recomendado!"
+                "Diego armó el sitio web de mi negocio de sublimación. Quedó excelente, rápido y fácil de usar. A las pocas semanas ya noté más ventas. ¡Recomendado!"
               </p>
               <div className="flex items-center justify-center">
                 <div className="flex flex-col items-center">
@@ -436,8 +447,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 text-center md:text-left">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Diego Godoy</h3>
-              <p className="text-blue-200">Desarrollador Web para Emprendedores</p>
+              <h3 className="text-2xl font-bold mb-4">IACREATIVATOOLS</h3>
+              <p className="text-blue-200">Desarrollo Web - consulting AI - Marketing Digital</p>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Links Rápidos</h4>
@@ -457,7 +468,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-blue-800 text-center text-blue-300">
-            <p>© {new Date().getFullYear()} Diego Godoy. Todos los derechos reservados.</p>
+            <p>© {new Date().getFullYear()} IACREATIVATOOLS. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

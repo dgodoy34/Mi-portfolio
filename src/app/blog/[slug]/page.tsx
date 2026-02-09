@@ -293,7 +293,7 @@ const fetchPost = async () => {
       <nav className="bg-white border-b border-gray-200 py-4 mb-12 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-blue-900">
-            Diego Godoy
+            IACREATIVATOOLS
           </Link>
           <Link href="/blog" className="text-blue-600 font-semibold hover:text-blue-800 flex items-center gap-2">
             <span>←</span> Blog

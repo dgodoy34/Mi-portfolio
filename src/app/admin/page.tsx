@@ -8,90 +8,421 @@ import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Link from 'next/link';
 
-
-// Importar Tiptap y extensiones necesarias
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import Color from '@tiptap/extension-color';
-import {TextStyle} from '@tiptap/extension-text-style';
-import FontFamily from '@tiptap/extension-font-family'; // Para fuentes
+import { TextStyle } from '@tiptap/extension-text-style';
+import FontFamily from '@tiptap/extension-font-family';
+import Image from '@tiptap/extension-image';
+import Underline from '@tiptap/extension-underline';
+import { Extension } from '@tiptap/core';
 
-// Componente del Editor Tiptap - CORREGIDO (teclado + fuentes, color, títulos)
-const TiptapEditor = ({ content, onChange }: { content: string; onChange: (html: string) => void }) => {
+/* =========================
+   ✅ EXTENSIÓN FONT SIZE (CORREGIDA)
+========================= */
+const FontSize = Extension.create({
+  name: 'fontSize',
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ['textStyle'],
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: (element) => element.style.fontSize?.replace('px', ''),
+            renderHTML: (attributes) => {
+              if (!attributes.fontSize) return {};
+              return { style: `font-size: ${attributes.fontSize}px` };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      setFontSize:
+        (fontSize) =>
+        ({ chain }) => {
+          return chain().setMark('textStyle', { fontSize }).run();
+        },
+
+      unsetFontSize:
+        () =>
+        ({ chain }) => {
+          return chain()
+            .setMark('textStyle', { fontSize: null })
+            .run();
+        },
+    };
+  },
+});
+
+/* =========================
+   ✅ COMPONENTE TIPTAP (CORREGIDO - SIN DUPLICADOS)
+========================= */
+const TiptapEditor = ({
+  content,
+  onChange,
+}: {
+  content: string;
+  onChange: (html: string) => void;
+}) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3], // H1, H2, H3
+          levels: [1, 2, 3],
         },
+        // ⚠️ StarterKit ya incluye underline → NO agregar Underline por separado
       }),
+
+      // ⚠️ ORDEN CRÍTICO - NO CAMBIAR
+      TextStyle.configure({}),
+      Color.configure({ types: ['textStyle'] }),
+      Highlight, // ✅ Sin .configure()
+      FontFamily.configure({
+        types: ['textStyle'],
+      }),
+      FontSize.configure({
+        types: ['textStyle'],
+      }),
+      
+      // ✅ TextAlign DEBE ir DESPUÉS de TextStyle y sus derivados
       TextAlign.configure({
         types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right', 'justify'],
       }),
-      Highlight,
-      Color,
-      TextStyle,
-      FontFamily.configure({
-        types: ['textStyle'], // Permite cambiar fuente
+
+      Image.configure({
+        inline: false,
+        allowBase64: true,
       }),
     ],
+
     content: content || '<p>Escribe aquí tu contenido...</p>',
+
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    editable: true,          // Fuerza que sea editable
-    autofocus: 'end',        // Enfoca al final para que capture teclado
+
+    editable: true,
+    autofocus: 'end',
     immediatelyRender: false,
   });
 
+  // ✅ Cuando el contenido cambia desde afuera (modo edición)
+  useEffect(() => {
+    if (!editor) return;
+
+    if (content !== undefined) {
+      const current = editor.getHTML();
+      if (current !== content) {
+        editor.commands.setContent(content, { emitUpdate: false });
+      }
+    }
+  }, [content, editor]);
+
   if (!editor) {
-    return <div className="p-6 bg-white border rounded min-h-[300px] flex items-center justify-center text-gray-500">Cargando editor...</div>;
+    return (
+      <div className="p-6 bg-white border rounded min-h-[300px] flex items-center justify-center text-gray-500">
+        Cargando editor...
+      </div>
+    );
   }
+
+  // ✅ Insertar imagen por URL
+  const insertImageByUrl = () => {
+    const url = prompt('Pegá el link de la imagen (https://...)');
+    if (!url) return;
+
+    editor.chain().focus().setImage({ src: url }).run();
+  };
+
+  // ✅ Botones
+  const btnBase =
+    'px-2.5 py-2 rounded text-white hover:bg-gray-800 transition flex items-center justify-center text-sm';
+  const btnActive = 'bg-blue-700';
+  const btnInactive = 'bg-gray-700';
 
   return (
     <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm">
-      {/* Toolbar OSCURA + nuevas opciones */}
-      <div className="bg-gray-900 p-2.5 flex flex-wrap gap-1.5 border-b border-gray-800">
-        {/* Básicos */}
-        <button onClick={() => editor.chain().focus().toggleBold().run()} className={`px-3 py-1.5 rounded text-white font-bold hover:bg-gray-800 ${editor.isActive('bold') ? 'bg-blue-700' : ''}`} title="Negrita">B</button>
-        <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`px-3 py-1.5 rounded text-white italic hover:bg-gray-800 ${editor.isActive('italic') ? 'bg-blue-700' : ''}`} title="Cursiva">I</button>
-        <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={`px-3 py-1.5 rounded text-white underline hover:bg-gray-800 ${editor.isActive('underline') ? 'bg-blue-700' : ''}`} title="Subrayado">U</button>
+      {/* Toolbar */}
+      <div className="bg-gray-900 p-2.5 flex flex-wrap gap-1.5 border-b border-gray-800 items-center">
+        {/* ======= BÁSICOS ======= */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`${btnBase} ${
+            editor.isActive('bold') ? btnActive : btnInactive
+          }`}
+          title="Negrita"
+        >
+          <b>B</b>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`${btnBase} ${
+            editor.isActive('italic') ? btnActive : btnInactive
+          }`}
+          title="Cursiva"
+        >
+          <i>I</i>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={`${btnBase} ${
+            editor.isActive('underline') ? btnActive : btnInactive
+          }`}
+          title="Subrayado"
+        >
+          <span style={{ textDecoration: 'underline' }}>U</span>
+        </button>
 
         <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
 
-        {/* Títulos */}
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-700' : ''}`} title="Título grande (H1)">H1</button>
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-700' : ''}`} title="Título mediano (H2)">H2</button>
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('heading', { level: 3 }) ? 'bg-blue-700' : ''}`} title="Título chico (H3)">H3</button>
+        {/* ======= TAMAÑO DE LETRA ======= */}
+        <select
+          className="px-2 py-2 rounded bg-gray-800 text-white text-sm border border-gray-700 outline-none"
+          onChange={(e) =>
+            editor.chain().focus().setMark('textStyle', { fontSize: e.target.value }).run()
+          }
+          defaultValue="16"
+          title="Tamaño de letra"
+        >
+          <option value="12">12px</option>
+          <option value="14">14px</option>
+          <option value="16">16px</option>
+          <option value="18">18px</option>
+          <option value="22">22px</option>
+          <option value="28">28px</option>
+          <option value="36">36px</option>
+        </select>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().unsetMark('textStyle').run()}
+          className={`${btnBase} ${btnInactive}`}
+          title="Reset tamaño"
+        >
+          ↺
+        </button>
 
         <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
 
-        {/* Color de letra */}
-        <button onClick={() => editor.chain().focus().setColor('#000000').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Negro">A</button>
-        <button onClick={() => editor.chain().focus().setColor('#dc2626').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Rojo">A</button>
-        <button onClick={() => editor.chain().focus().setColor('#2563eb').run()} className="px-3 py-1.5 rounded text-white hover:bg-gray-800" title="Azul">A</button>
+        {/* ======= TITULOS ======= */}
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          className={`${btnBase} ${
+            editor.isActive('heading', { level: 1 }) ? btnActive : btnInactive
+          }`}
+          title="Título grande (H1)"
+        >
+          H1
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          className={`${btnBase} ${
+            editor.isActive('heading', { level: 2 }) ? btnActive : btnInactive
+          }`}
+          title="Título mediano (H2)"
+        >
+          H2
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+          className={`${btnBase} ${
+            editor.isActive('heading', { level: 3 }) ? btnActive : btnInactive
+          }`}
+          title="Título chico (H3)"
+        >
+          H3
+        </button>
 
         <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
 
-        {/* Fuentes básicas */}
-        <button onClick={() => editor.chain().focus().setFontFamily('sans-serif').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'sans-serif' }) ? 'bg-blue-700' : ''}`} title="Sans-serif (normal)">Sans</button>
-        <button onClick={() => editor.chain().focus().setFontFamily('serif').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'serif' }) ? 'bg-blue-700' : ''}`} title="Serif (clásica)">Serif</button>
-        <button onClick={() => editor.chain().focus().setFontFamily('monospace').run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('textStyle', { fontFamily: 'monospace' }) ? 'bg-blue-700' : ''}`} title="Monospace (código)">Mono</button>
+        {/* ======= COLOR ======= */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setColor('#000000').run()}
+          className={`${btnBase} ${btnInactive}`}
+          title="Negro"
+        >
+          A
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setColor('#dc2626').run()}
+          className={`${btnBase} ${btnInactive}`}
+          title="Rojo"
+        >
+          <span style={{ color: '#dc2626', fontWeight: 800 }}>A</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setColor('#2563eb').run()}
+          className={`${btnBase} ${btnInactive}`}
+          title="Azul"
+        >
+          <span style={{ color: '#2563eb', fontWeight: 800 }}>A</span>
+        </button>
 
         <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
 
-        {/* Listas y alineación */}
-        <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('bulletList') ? 'bg-blue-700' : ''}`} title="Lista con viñetas">•</button>
-        <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`px-3 py-1.5 rounded text-white hover:bg-gray-800 ${editor.isActive('orderedList') ? 'bg-blue-700' : ''}`} title="Lista numerada">1.</button>
+        {/* ======= FUENTES ======= */}
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().setFontFamily('sans-serif').run()
+          }
+          className={`${btnBase} ${
+            editor.isActive('textStyle', { fontFamily: 'sans-serif' })
+              ? btnActive
+              : btnInactive
+          }`}
+          title="Sans"
+        >
+          Sans
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setFontFamily('serif').run()}
+          className={`${btnBase} ${
+            editor.isActive('textStyle', { fontFamily: 'serif' })
+              ? btnActive
+              : btnInactive
+          }`}
+          title="Serif"
+        >
+          Serif
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().setFontFamily('monospace').run()
+          }
+          className={`${btnBase} ${
+            editor.isActive('textStyle', { fontFamily: 'monospace' })
+              ? btnActive
+              : btnInactive
+          }`}
+          title="Mono"
+        >
+          Mono
+        </button>
+
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* ======= LISTAS ======= */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={`${btnBase} ${
+            editor.isActive('bulletList') ? btnActive : btnInactive
+          }`}
+          title="Lista"
+        >
+          ••
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={`${btnBase} ${
+            editor.isActive('orderedList') ? btnActive : btnInactive
+          }`}
+          title="Lista numerada"
+        >
+          1.
+        </button>
+
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* ======= ALINEACIÓN ======= */}
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          className={`${btnBase} ${
+            editor.isActive({ textAlign: 'left' }) ? btnActive : btnInactive
+          }`}
+          title="Alinear izquierda"
+        >
+          ⬅
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          className={`${btnBase} ${
+            editor.isActive({ textAlign: 'center' }) ? btnActive : btnInactive
+          }`}
+          title="Centrar"
+        >
+          ⬌
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          className={`${btnBase} ${
+            editor.isActive({ textAlign: 'right' }) ? btnActive : btnInactive
+          }`}
+          title="Alinear derecha"
+        >
+          ➡
+        </button>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+          className={`${btnBase} ${
+            editor.isActive({ textAlign: 'justify' }) ? btnActive : btnInactive
+          }`}
+          title="Justificar"
+        >
+          ☰
+        </button>
+
+        <div className="border-l border-gray-700 mx-2 h-6 self-center"></div>
+
+        {/* ======= IMAGEN ======= */}
+        <button
+          type="button"
+          onClick={insertImageByUrl}
+          className={`${btnBase} ${btnInactive}`}
+          title="Insertar imagen"
+        >
+          🖼️
+        </button>
+
+        <div className="flex-grow"></div>
       </div>
 
-      {/* Área de edición - TEXTO NEGRO y editable */}
-      <EditorContent 
-        editor={editor} 
-        className="p-6 min-h-[400px] text-gray-900 prose prose-lg focus:outline-none"
-      />
+      {/* Área de edición */}
+      <EditorContent editor={editor} className="tiptap p-6 min-h-[400px]" />
     </div>
   );
 };
