@@ -51,7 +51,7 @@ export default function Blog() {
     <div className="min-h-screen bg-gray-50 py-20 px-6">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-900">
-          Blog - IACREATIVATOOLS
+          IACREATIVATOOLS BLOG
         </h1>
 
         {posts.length === 0 ? (
