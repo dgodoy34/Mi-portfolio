@@ -177,10 +177,40 @@ const fetchPost = async () => {
     }
   };
 
-  const getEmbedUrl = (url: string) => {
-    if (!url) return '';
-    return url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
-  };
+   // const getEmbedUrl = (url: string) => {
+    // if (!url) return '';
+    // return url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
+  // };
+
+  //nueva funcion youtube
+
+  const getEmbedUrl = (url: string | undefined) => {
+  if (!url || typeof url !== 'string' || url.trim() === '') return '';
+
+  // Limpieza básica
+  const cleanUrl = url.trim();
+
+  // Si ya es embed, devolver tal cual
+  if (cleanUrl.includes('/embed/')) return cleanUrl;
+
+  // Extraer ID de formatos comunes
+  const patterns = [
+    /(?:v=|youtu\.be\/)([^&\n?#]+)/i,          // watch?v= o youtu.be/
+    /youtube\.com\/embed\/([^&\n?#]+)/i,       // ya embed
+    /youtube\.com\/shorts\/([^&\n?#]+)/i,      // shorts
+  ];
+
+  for (const pattern of patterns) {
+    const match = cleanUrl.match(pattern);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+  }
+
+  // Si no matchea nada (ej: home de YT o inválido), devolver vacío para no renderizar iframe
+  console.warn('URL de video inválida:', cleanUrl);
+  return '';
+};
 
   // Función para formatear la fecha (soporta string actual y futuro Timestamp)
   const formatPostDate = () => {
