@@ -494,82 +494,129 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TRABAJOS DINÁMICOS */}
-      <section id="proyectos" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-blue-900">
-            Casos / Proyectos
-          </h2>
+      {/* CASOS / PROYECTOS (DINÁMICOS) */}
+<section id="proyectos" className="py-20 bg-white text-gray-900">
+  <div className="max-w-7xl mx-auto px-6">
 
-          <p className="text-center text-gray-700 max-w-3xl mx-auto mb-12">
-            Acá muestro trabajos reales. Pueden ser sitios web, automatizaciones o soluciones con IA.
-          </p>
+    <div className="text-center mb-14">
+      <h2 className="text-4xl md:text-5xl font-bold text-blue-900">
+        Casos reales
+      </h2>
 
-          {loading ? (
-            <p className="text-center text-gray-600 text-lg py-10">Cargando trabajos...</p>
-          ) : trabajos.length === 0 ? (
-            <p className="text-center text-gray-600 text-lg py-10">Aún no hay proyectos cargados.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {trabajos.map((trabajo) => (
-                <div
-                  key={trabajo.id}
-                  className="bg-gray-50 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition border border-gray-100"
-                >
-                  {trabajo.imagenUrl ? (
-                    <img
-                      src={trabajo.imagenUrl}
-                      alt={trabajo.titulo || 'Trabajo sin título'}
-                      className="w-full h-56 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
-                      Sin imagen
-                    </div>
-                  )}
+      <p className="text-center text-gray-700 max-w-3xl mx-auto mt-4 text-lg">
+        Algunos proyectos que armé para negocios reales.
+        <br className="hidden sm:block" />
+        Sitios, sistemas y automatizaciones pensadas para vender más y trabajar con menos esfuerzo.
+      </p>
+    </div>
 
-                  <div className="p-6">
-                    <h3 className="text-2xl font-bold mb-3 text-blue-900">
-                      {trabajo.titulo || 'Sin título'}
-                    </h3>
-
-                    <div
-                      className="text-gray-600 mb-4 line-clamp-3 prose prose-sm"
-                      dangerouslySetInnerHTML={{
-                        __html: trabajo.descripcion || 'Sin descripción disponible',
-                      }}
-                    />
-
-                    <Link
-                      href="/trabajos"
-                      className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
-                    >
-                      Ver Proyecto <span aria-hidden="true">→</span>
-                    </Link>
-
-                    {user && (
-                      <div className="flex gap-4 mt-6">
-                        <Link
-                          href={`/admin?edit=trabajo&id=${trabajo.id}`}
-                          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition text-sm font-medium"
-                        >
-                          Editar
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteTrabajo(trabajo.id)}
-                          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm font-medium"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                  </div>
+    {loading ? (
+      <p className="text-center text-gray-600 text-lg py-10">
+        Cargando casos...
+      </p>
+    ) : trabajos.length === 0 ? (
+      <div className="text-center text-gray-600 text-lg py-10">
+        Aún no hay casos cargados.
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {trabajos.map((trabajo) => (
+          <div
+            key={trabajo.id}
+            className="group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300"
+          >
+            {/* Imagen */}
+            <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
+              {trabajo.imagenUrl ? (
+                <img
+                  src={trabajo.imagenUrl}
+                  alt={trabajo.titulo || 'Caso sin título'}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  Sin imagen
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
-      </section>
+
+            {/* Contenido */}
+            <div className="p-6 flex flex-col h-full">
+
+              {/* Etiqueta (placeholder por ahora) */}
+              <div className="flex gap-2 mb-4">
+                <span className="text-xs font-semibold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">
+                  Proyecto real
+                </span>
+
+                <span className="text-xs font-semibold bg-gray-50 text-gray-700 px-3 py-1 rounded-full border border-gray-100">
+                  Web / IA
+                </span>
+              </div>
+
+              <h3 className="text-2xl font-bold text-blue-900 mb-3 leading-snug">
+                {trabajo.titulo || 'Sin título'}
+              </h3>
+
+              <div
+                className="text-gray-600 mb-6 line-clamp-3 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{
+                  __html: trabajo.descripcion || 'Sin descripción disponible',
+                }}
+              />
+
+              <div className="mt-auto flex items-center justify-between">
+                <Link
+                  href="/trabajos"
+                  className="text-blue-700 font-semibold hover:underline inline-flex items-center gap-1"
+                >
+                  Ver caso <span aria-hidden="true">→</span>
+                </Link>
+
+                <span className="text-xs text-gray-400">
+                  ID: {trabajo.id.slice(0, 6)}...
+                </span>
+              </div>
+
+              {user && (
+                <div className="flex gap-3 mt-6">
+                  <Link
+                    href={`/admin?edit=trabajo&id=${trabajo.id}`}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
+                  >
+                    Editar
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteTrabajo(trabajo.id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {/* CTA abajo */}
+    <div className="text-center mt-16">
+      <p className="text-gray-700 mb-4 text-lg">
+        ¿Querés que armemos un sistema así para tu negocio?
+      </p>
+
+      <Link
+        href="#contacto"
+        className="inline-flex items-center gap-2 bg-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition shadow-lg"
+      >
+        Quiero una demo <span className="text-xl">→</span>
+      </Link>
+    </div>
+
+  </div>
+</section>
+
 
       {/* SOBRE MÍ */}
       <section id="sobre-mi" className="py-20 bg-gradient-to-b from-white to-gray-50 text-gray-800">
