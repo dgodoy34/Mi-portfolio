@@ -170,7 +170,7 @@ export default function Home() {
           </p>
 
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Implemento Inteligencia Artificial para que tu negocio venda más
+            Implementamos Inteligencia Artificial para que tu negocio venda más
             <span className="text-white/80"> (y trabaje menos)</span>
           </h1>
 
