@@ -7,6 +7,8 @@ import { auth, db } from '../../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, limit, deleteDoc, doc } from 'firebase/firestore';
 
+import WhatsAppButton from '@/components/WhatsAppButton';   // ajustá la ruta según donde lo guardaste
+
 export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [trabajos, setTrabajos] = useState<any[]>([]);
@@ -79,19 +81,10 @@ export default function Home() {
 
   return (
     <div className="bg-blue-600 text-white">
+
+      
       {/* BOTÓN FLOTANTE WHATSAPP */}
-      <a
-        href="https://wa.me/5491168808942?text=Hola%20Diego%2C%20quiero%20consultarte%20sobre%20Consultor%C3%ADa%20de%20IA%20para%20mi%20negocio"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-[120px] z-[9999] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#20b858] transition-all duration-300 hover:scale-110 flex items-center justify-center"
-        aria-label="Chatea conmigo por WhatsApp"
-        title="Chatea conmigo por WhatsApp"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
-        </svg>
-      </a>
+     <WhatsAppButton />
 
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -494,128 +487,129 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CASOS / PROYECTOS (DINÁMICOS) */}
-<section id="proyectos" className="py-20 bg-white text-gray-900">
+      {/* CASOS / SISTEMAS IMPLEMENTADOS */}
+<section id="proyectos" className="py-20 bg-white">
   <div className="max-w-7xl mx-auto px-6">
+    <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-blue-900">
+      Sistemas y Proyectos
+    </h2>
 
-    <div className="text-center mb-14">
-      <h2 className="text-4xl md:text-5xl font-bold text-blue-900">
-        Casos reales
-      </h2>
-
-      <p className="text-center text-gray-700 max-w-3xl mx-auto mt-4 text-lg">
-        Algunos proyectos que armé para negocios reales.
-        <br className="hidden sm:block" />
-        Sitios, sistemas y automatizaciones pensadas para vender más y trabajar con menos esfuerzo.
-      </p>
-    </div>
+    <p className="text-center text-gray-700 max-w-4xl mx-auto mb-12">
+      Acá te muestro ejemplos reales de lo que construyo: sitios, sistemas y soluciones digitales.
+      <br className="hidden sm:block" />
+      Mi foco hoy es <strong>automatizar ventas</strong>, mejorar atención y aplicar IA de forma práctica.
+    </p>
 
     {loading ? (
-      <p className="text-center text-gray-600 text-lg py-10">
-        Cargando casos...
-      </p>
+      <p className="text-center text-gray-600 text-lg py-10">Cargando proyectos...</p>
     ) : trabajos.length === 0 ? (
-      <div className="text-center text-gray-600 text-lg py-10">
-        Aún no hay casos cargados.
-      </div>
+      <p className="text-center text-gray-600 text-lg py-10">
+        Aún no hay proyectos cargados.
+      </p>
     ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {trabajos.map((trabajo) => (
-          <div
-            key={trabajo.id}
-            className="group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300"
-          >
-            {/* Imagen */}
-            <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
-              {trabajo.imagenUrl ? (
-                <img
-                  src={trabajo.imagenUrl}
-                  alt={trabajo.titulo || 'Caso sin título'}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        {trabajos.map((trabajo) => {
+          const titulo = trabajo.titulo || 'Proyecto sin título';
+          const tieneImagen = !!trabajo.imagenUrl;
+
+          return (
+            <div
+              key={trabajo.id}
+              className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition border border-gray-100"
+            >
+              {/* Imagen */}
+              <div className="relative">
+                {tieneImagen ? (
+                  <img
+                    src={trabajo.imagenUrl}
+                    alt={titulo}
+                    className="w-full h-56 object-cover group-hover:scale-[1.02] transition duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-56 bg-gray-100 flex items-center justify-center text-gray-500">
+                    Sin imagen
+                  </div>
+                )}
+
+                {/* Badge (sin tocar Firestore) */}
+                <div className="absolute top-4 left-4">
+                  <span className="bg-blue-600 text-white text-xs font-semibold px-3 py-2 rounded-full shadow-md">
+                    Caso / Proyecto
+                  </span>
+                </div>
+              </div>
+
+              {/* Contenido */}
+              <div className="p-6">
+                <h3 className="text-2xl font-bold mb-3 text-blue-900 leading-tight">
+                  {titulo}
+                </h3>
+
+                {/* Descripción */}
+                <div
+                  className="text-gray-600 mb-5 line-clamp-4 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: trabajo.descripcion || 'Sin descripción disponible',
+                  }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-500">
-                  Sin imagen
-                </div>
-              )}
-            </div>
 
-            {/* Contenido */}
-            <div className="p-6 flex flex-col h-full">
-
-              {/* Etiqueta (placeholder por ahora) */}
-              <div className="flex gap-2 mb-4">
-                <span className="text-xs font-semibold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">
-                  Proyecto real
-                </span>
-
-                <span className="text-xs font-semibold bg-gray-50 text-gray-700 px-3 py-1 rounded-full border border-gray-100">
-                  Web / IA
-                </span>
-              </div>
-
-              <h3 className="text-2xl font-bold text-blue-900 mb-3 leading-snug">
-                {trabajo.titulo || 'Sin título'}
-              </h3>
-
-              <div
-                className="text-gray-600 mb-6 line-clamp-3 prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: trabajo.descripcion || 'Sin descripción disponible',
-                }}
-              />
-
-              <div className="mt-auto flex items-center justify-between">
-                <Link
-                  href="/trabajos"
-                  className="text-blue-700 font-semibold hover:underline inline-flex items-center gap-1"
-                >
-                  Ver caso <span aria-hidden="true">→</span>
-                </Link>
-
-                <span className="text-xs text-gray-400">
-                  ID: {trabajo.id.slice(0, 6)}...
-                </span>
-              </div>
-
-              {user && (
-                <div className="flex gap-3 mt-6">
+                {/* CTA */}
+                <div className="flex items-center justify-between gap-4">
                   <Link
-                    href={`/admin?edit=trabajo&id=${trabajo.id}`}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition text-sm font-medium"
+                    href="/trabajos"
+                    className="inline-flex items-center gap-2 text-blue-700 font-semibold hover:underline"
                   >
-                    Editar
+                    Ver detalles <span aria-hidden="true">→</span>
                   </Link>
-                  <button
-                    onClick={() => handleDeleteTrabajo(trabajo.id)}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm font-medium"
+
+                  <Link
+                    href="#contacto"
+                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-700 transition shadow"
                   >
-                    Eliminar
-                  </button>
+                    Quiero algo así
+                  </Link>
                 </div>
-              )}
+
+                {/* Admin */}
+                {user && (
+                  <div className="flex gap-4 mt-6">
+                    <Link
+                      href={`/admin?edit=trabajo&id=${trabajo.id}`}
+                      className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition text-sm font-medium"
+                    >
+                      Editar
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteTrabajo(trabajo.id)}
+                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm font-medium"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     )}
 
-    {/* CTA abajo */}
-    <div className="text-center mt-16">
-      <p className="text-gray-700 mb-4 text-lg">
-        ¿Querés que armemos un sistema así para tu negocio?
+    {/* CTA final */}
+    <div className="text-center mt-14">
+      <p className="text-gray-700 mb-5 text-lg">
+        ¿Querés que tu negocio tenga un sistema así, pero con IA y automatización?
       </p>
 
       <Link
         href="#contacto"
-        className="inline-flex items-center gap-2 bg-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition shadow-lg"
+        className="inline-flex items-center gap-2 bg-blue-900 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-800 transition shadow-md"
       >
         Quiero una demo <span className="text-xl">→</span>
       </Link>
     </div>
-
   </div>
 </section>
+
 
 
       {/* SOBRE MÍ */}
